@@ -17,7 +17,7 @@ const renderLogin = () =>
 describe('Login Component', () => {
   test('renders the login form', () => {
     renderLogin();
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();

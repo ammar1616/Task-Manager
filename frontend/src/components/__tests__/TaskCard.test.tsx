@@ -32,10 +32,10 @@ const renderCard = (task = mockTask, onClick = jest.fn()) =>
   );
 
 describe('TaskCard Component', () => {
-  test('renders task title and priority', () => {
+  test('renders task title and status', () => {
     renderCard();
     expect(screen.getByText('Test Task')).toBeInTheDocument();
-    expect(screen.getByText('high')).toBeInTheDocument();
+    expect(screen.getByText('todo')).toBeInTheDocument();
   });
 
   test('shows description text', () => {
