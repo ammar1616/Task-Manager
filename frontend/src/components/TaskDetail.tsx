@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Upload, Button, Descriptions, Tag, message, Popconfirm } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import api from '../api/axios';
+import api, { SERVER_URL } from '../api/axios';
 import { Task } from '../types';
 import type { UploadFile } from 'antd';
 
@@ -111,7 +111,7 @@ const TaskDetail: React.FC<Props> = ({ task, open, onClose, onSuccess }) => {
           </Descriptions.Item>
           {task.attachment && (
             <Descriptions.Item label="Attachment">
-              <a href={`http://localhost:5000${task.attachment}`} target="_blank" rel="noreferrer">View file</a>
+              <a href={`${SERVER_URL}${task.attachment}`} target="_blank" rel="noreferrer">View file</a>
             </Descriptions.Item>
           )}
           <Descriptions.Item label="Created">

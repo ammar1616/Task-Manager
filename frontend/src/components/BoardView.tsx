@@ -84,37 +84,38 @@ const BoardView: React.FC = () => {
     tasks.filter((t) => t.dueDate && new Date(t.dueDate) < new Date()).length;
 
   return (
-    <div style={{ padding: '80px 24px 24px' }}>
+    <div style={{ padding: '80px 12px 12px' }}>
       <DragDropContext onDragEnd={onDragEnd}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Row gutter={12} style={{ marginBottom: 16 }}>
-              <Col flex="auto">
+            <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+              <Col xs={24} md={12}>
                 <Input
                   prefix={<SearchOutlined />}
                   placeholder="Search tasks..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                   allowClear
+                  style={{ width: '100%' }}
                 />
               </Col>
-              <Col>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="Priority"
                   value={priorityFilter}
                   onChange={(v) => { setPriorityFilter(v); setPage(1); }}
                   allowClear
-                  style={{ width: 140 }}
+                  style={{ width: '100%' }}
                 >
                   <Select.Option value="low">Low</Select.Option>
                   <Select.Option value="medium">Medium</Select.Option>
                   <Select.Option value="high">High</Select.Option>
                 </Select>
               </Col>
-              <Col>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="Add Task"
-                  style={{ width: 140 }}
+                  style={{ width: '100%' }}
                   onSelect={() => setFormOpen(true)}
                   value={undefined}
                 >
@@ -125,21 +126,15 @@ const BoardView: React.FC = () => {
           </Col>
 
           <Col span={24}>
-            <Row gutter={12} style={{ marginBottom: 16 }}>
-              <Col span={4}>
-                <Card size="small"><Statistic title="Total" value={total} /></Card>
-              </Col>
-              <Col span={4}>
-                <Card size="small"><Statistic title="Overdue" value={getOverdueCount()} valueStyle={{ color: '#ff4d4f' }} /></Card>
-              </Col>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+              <Card size="small" style={{ flex: '1 1 200px' }}><Statistic title="Total" value={total} /></Card>
+              <Card size="small" style={{ flex: '1 1 200px' }}><Statistic title="Overdue" value={getOverdueCount()} valueStyle={{ color: '#ff4d4f' }} /></Card>
               {columns.map((col) => (
-                <Col span={4} key={col.id}>
-                  <Card size="small">
-                    <Statistic title={col.title} value={tasks.filter((t) => t.status === col.id).length} />
-                  </Card>
-                </Col>
+                <Card size="small" key={col.id} style={{ flex: '1 1 200px' }}>
+                  <Statistic title={col.title} value={tasks.filter((t) => t.status === col.id).length} />
+                </Card>
               ))}
-            </Row>
+            </div>
           </Col>
 
           {loading ? (
@@ -152,7 +147,7 @@ const BoardView: React.FC = () => {
             </Col>
           ) : (
             columns.map((col) => (
-              <Col span={8} key={col.id}>
+              <Col xs={24} md={12} lg={8} key={col.id}>
                 <Card
                   title={col.title}
                   size="small"

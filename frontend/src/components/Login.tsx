@@ -23,7 +23,7 @@ const Login: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-      <Card style={{ width: 400 }}>
+      <Card style={{ width: '90%', maxWidth: 400 }}>
         <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>Login</Title>
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item name="email" rules={[{ required: true, type: 'email', message: 'Valid email required' }]}>
