@@ -1,12 +1,12 @@
 import request from 'supertest';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import taskRoutes from '../routes/tasks';
 import { mockUserId, createMockTask } from './helpers';
 
 jest.mock('../middleware/auth', () => ({
   __esModule: true,
-  default: (req: any, _res: any, next: any) => {
-    req.user = { _id: 'mock-user-id', name: 'Test User', email: 'test@example.com' };
+  default: (req: Request, _res: Response, next: NextFunction) => {
+    Object.assign(req, { user: { _id: 'mock-user-id', name: 'Test User', email: 'test@example.com' } });
     next();
   },
 }));
@@ -102,6 +102,20 @@ describe('Task Routes', () => {
 
       expect(res.status).toBe(400);
       expect(res.body.errors).toBeDefined();
+    });
+
+    it('should create a task with file attachment', async () => {
+      const Task = require('../models/Task').default;
+      const mockTask = createMockTask({ _id: 't1', attachment: '/uploads/test-file.txt' });
+      Task.create.mockResolvedValue(mockTask);
+
+      const res = await request(app)
+        .post('/api/tasks')
+        .field('title', 'Task with file')
+        .attach('attachment', Buffer.from('file content'), 'test-file.txt');
+
+      expect(res.status).toBe(201);
+      expect(res.body.attachment).toContain('/uploads/');
     });
   });
 

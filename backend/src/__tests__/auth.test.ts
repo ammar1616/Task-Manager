@@ -1,9 +1,12 @@
 import request from 'supertest';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import authRoutes from '../routes/auth';
 
 process.env.JWT_SECRET = 'test-jwt-secret';
 process.env.JWT_EXPIRES_IN = '1h';
+
+const validToken = jwt.sign({ userId: 'user1' }, process.env.JWT_SECRET);
 
 jest.mock('../models/User');
 
@@ -58,6 +61,38 @@ describe('Auth Routes', () => {
 
       expect(res.status).toBe(400);
       expect(res.body.errors).toBeDefined();
+    });
+  });
+
+  describe('GET /api/auth/me', () => {
+    it('should return current user with valid token', async () => {
+      const User = require('../models/User').default;
+      User.findById.mockResolvedValue({
+        _id: 'user1',
+        name: 'Test',
+        email: 'test@example.com',
+      });
+
+      const res = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${validToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.email).toBe('test@example.com');
+    });
+
+    it('should return 401 without token', async () => {
+      const res = await request(app).get('/api/auth/me');
+      expect(res.status).toBe(401);
+      expect(res.body.message).toBe('No token provided');
+    });
+
+    it('should return 401 with invalid token', async () => {
+      const res = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', 'Bearer invalid-token');
+      expect(res.status).toBe(401);
+      expect(res.body.message).toBe('Invalid token');
     });
   });
 

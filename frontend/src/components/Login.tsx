@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const { Title } = Typography;
@@ -14,8 +15,9 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(values.email, values.password);
-    } catch (err: any) {
-      message.error(err.response?.data?.message || 'Login failed');
+    } catch (err: unknown) {
+      const msg = err instanceof AxiosError ? err.response?.data?.message : null;
+      message.error(msg || 'Login failed');
     } finally {
       setLoading(false);
     }

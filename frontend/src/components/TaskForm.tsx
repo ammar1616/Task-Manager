@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { AxiosError } from 'axios';
 import api from '../api/axios';
 import type { UploadFile } from 'antd';
 
@@ -16,14 +17,14 @@ const TaskForm: React.FC<Props> = ({ open, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     setLoading(true);
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         title: values.title,
         description: values.description,
         priority: values.priority || 'medium',
-        dueDate: values.dueDate ? values.dueDate.toISOString() : undefined,
+        dueDate: values.dueDate ? (values.dueDate as dayjs.Dayjs).toISOString() : undefined,
       };
 
       const res = await api.post('/tasks', payload);
@@ -39,8 +40,9 @@ const TaskForm: React.FC<Props> = ({ open, onClose, onSuccess }) => {
       setFileList([]);
       onSuccess();
       onClose();
-    } catch (err: any) {
-      message.error(err.response?.data?.message || 'Failed to create task');
+    } catch (err: unknown) {
+      const msg = err instanceof AxiosError ? err.response?.data?.message : null;
+      message.error(msg || 'Failed to create task');
     } finally {
       setLoading(false);
     }

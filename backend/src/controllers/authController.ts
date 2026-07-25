@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { AuthRequest } from '../middleware/auth';
 import * as authService from '../services/authService';
+import { errorMessage } from '../utils/errors';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -14,9 +15,9 @@ export const register = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     const result = await authService.registerUser(name, email, password);
     res.status(201).json(result);
-  } catch (error: any) {
-    const status = error.message === 'Email already in use' ? 400 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    const status = errorMessage(error) === 'Email already in use' ? 400 : 500;
+    res.status(status).json({ message: errorMessage(error) });
   }
 };
 
@@ -31,9 +32,9 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const result = await authService.loginUser(email, password);
     res.json(result);
-  } catch (error: any) {
-    const status = error.message === 'Invalid credentials' ? 401 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    const status = errorMessage(error) === 'Invalid credentials' ? 401 : 500;
+    res.status(status).json({ message: errorMessage(error) });
   }
 };
 

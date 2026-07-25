@@ -2,6 +2,16 @@ import { Response } from 'express';
 import { validationResult } from 'express-validator';
 import { AuthRequest } from '../middleware/auth';
 import * as taskService from '../services/taskService';
+import { errorMessage } from '../utils/errors';
+
+const handleTaskError = (error: unknown, res: Response) => {
+  const msg = errorMessage(error);
+  if (msg === 'Task not found') {
+    res.status(404).json({ message: msg });
+  } else {
+    res.status(500).json({ message: msg });
+  }
+};
 
 export const getTasks = async (req: AuthRequest, res: Response) => {
   try {
@@ -23,8 +33,8 @@ export const getTasks = async (req: AuthRequest, res: Response) => {
     });
 
     res.json(result);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    res.status(500).json({ message: errorMessage(error) });
   }
 };
 
@@ -32,9 +42,8 @@ export const getTask = async (req: AuthRequest, res: Response) => {
   try {
     const task = await taskService.getTaskById(req.params.id, req.user!._id);
     res.json(task);
-  } catch (error: any) {
-    const status = error.message === 'Task not found' ? 404 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    handleTaskError(error, res);
   }
 };
 
@@ -59,8 +68,8 @@ export const createTask = async (req: AuthRequest, res: Response) => {
     });
 
     res.status(201).json(task);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    res.status(500).json({ message: errorMessage(error) });
   }
 };
 
@@ -84,9 +93,8 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
     });
 
     res.json(task);
-  } catch (error: any) {
-    const status = error.message === 'Task not found' ? 404 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    handleTaskError(error, res);
   }
 };
 
@@ -105,9 +113,8 @@ export const updateTaskStatus = async (req: AuthRequest, res: Response) => {
     );
 
     res.json(task);
-  } catch (error: any) {
-    const status = error.message === 'Task not found' ? 404 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    handleTaskError(error, res);
   }
 };
 
@@ -115,8 +122,7 @@ export const deleteTask = async (req: AuthRequest, res: Response) => {
   try {
     await taskService.deleteTask(req.params.id, req.user!._id);
     res.json({ message: 'Task deleted' });
-  } catch (error: any) {
-    const status = error.message === 'Task not found' ? 404 : 500;
-    res.status(status).json({ message: error.message });
+  } catch (error: unknown) {
+    handleTaskError(error, res);
   }
 };

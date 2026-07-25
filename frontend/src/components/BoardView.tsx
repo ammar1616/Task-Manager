@@ -2,13 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Row, Col, Card, Input, Select, Statistic, Pagination, Spin, Empty, message } from 'antd';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import { SearchOutlined } from '@ant-design/icons';
+import { AxiosError } from 'axios';
 import api from '../api/axios';
 import { Task } from '../types';
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail';
 import TaskForm from './TaskForm';
-
-const { Meta } = Card;
 
 const columns = [
   { id: 'todo', title: 'To Do', color: '#d9d9d9' },
@@ -35,15 +34,15 @@ const BoardView: React.FC = () => {
 
     setLoading(true);
     try {
-      const params: any = { page, limit: 10 };
+      const params: Record<string, unknown> = { page, limit: 10 };
       if (search) params.search = search;
       if (priorityFilter) params.priority = priorityFilter;
 
       const res = await api.get('/tasks', { params, signal: controller.signal });
       setTasks(res.data.tasks);
       setTotal(res.data.total);
-    } catch (err: any) {
-      if (err.name !== 'CanceledError') {
+    } catch (err: unknown) {
+      if (!(err instanceof AxiosError && err.name === 'CanceledError')) {
         message.error('Failed to load tasks');
       }
     } finally {

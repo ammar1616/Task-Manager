@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Upload, Button, Descriptions, Tag, message, Popconfirm } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { AxiosError } from 'axios';
 import api, { SERVER_URL } from '../api/axios';
 import { Task } from '../types';
 import type { UploadFile } from 'antd';
@@ -39,16 +40,16 @@ const TaskDetail: React.FC<Props> = ({ task, open, onClose, onSuccess }) => {
     }
   }, [open, task, form]);
 
-  const handleUpdate = async (values: any) => {
+  const handleUpdate = async (values: Record<string, unknown>) => {
     if (!task) return;
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('title', values.title);
-      if (values.description) formData.append('description', values.description);
-      formData.append('status', values.status);
-      formData.append('priority', values.priority);
-      if (values.dueDate) formData.append('dueDate', values.dueDate.toISOString());
+      formData.append('title', values.title as string);
+      if (values.description) formData.append('description', values.description as string);
+      formData.append('status', values.status as string);
+      formData.append('priority', values.priority as string);
+      if (values.dueDate) formData.append('dueDate', (values.dueDate as dayjs.Dayjs).toISOString());
       if (fileList.length > 0) {
         formData.append('attachment', fileList[0].originFileObj as Blob);
       }
@@ -57,8 +58,9 @@ const TaskDetail: React.FC<Props> = ({ task, open, onClose, onSuccess }) => {
       setEditing(false);
       onSuccess();
       onClose();
-    } catch (err: any) {
-      message.error(err.response?.data?.message || 'Update failed');
+    } catch (err: unknown) {
+      const msg = err instanceof AxiosError ? err.response?.data?.message : null;
+      message.error(msg || 'Update failed');
     } finally {
       setLoading(false);
     }
@@ -71,8 +73,9 @@ const TaskDetail: React.FC<Props> = ({ task, open, onClose, onSuccess }) => {
       message.success('Task deleted');
       onSuccess();
       onClose();
-    } catch {
-      message.error('Delete failed');
+    } catch (err: unknown) {
+      const msg = err instanceof AxiosError ? err.response?.data?.message : null;
+      message.error(msg || 'Delete failed');
     }
   };
 

@@ -1,4 +1,5 @@
 import Task from '../models/Task';
+import type { ITask } from '../models/Task';
 
 interface GetTasksParams {
   userId: string;
@@ -14,7 +15,7 @@ interface GetTasksParams {
 export const getTasks = async (params: GetTasksParams) => {
   const { userId, search, status, priority, sortBy, order, page = 1, limit = 10 } = params;
 
-  const filter: any = { user: userId };
+  const filter: Record<string, unknown> = { user: userId };
 
   if (search) {
     filter.title = { $regex: search, $options: 'i' };
@@ -85,8 +86,8 @@ export const updateTask = async (
 
   if (data.title !== undefined) task.title = data.title;
   if (data.description !== undefined) task.description = data.description;
-  if (data.status !== undefined) task.status = data.status as any;
-  if (data.priority !== undefined) task.priority = data.priority as any;
+  if (data.status !== undefined) task.status = data.status as ITask['status'];
+  if (data.priority !== undefined) task.priority = data.priority as ITask['priority'];
   if (data.dueDate !== undefined) task.dueDate = data.dueDate ?? undefined;
   if (data.attachment !== undefined) task.attachment = data.attachment;
 
@@ -103,7 +104,7 @@ export const updateTaskStatus = async (
     throw new Error('Task not found');
   }
 
-  task.status = status as any;
+  task.status = status as ITask['status'];
   return task.save();
 };
 
