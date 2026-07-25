@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 import User from '../models/User';
 
 export const registerUser = async (name: string, email: string, password: string) => {
@@ -12,8 +13,8 @@ export const registerUser = async (name: string, email: string, password: string
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   const user = await User.create({ name, email, password: hashedPassword });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET as string, {
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
   });
 
   return {
@@ -41,8 +42,8 @@ export const loginUser = async (email: string, password: string) => {
     throw new Error('Invalid credentials');
   }
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET as string, {
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
   });
 
   return {

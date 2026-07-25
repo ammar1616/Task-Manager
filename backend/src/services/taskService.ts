@@ -87,7 +87,7 @@ export const updateTask = async (
   if (data.description !== undefined) task.description = data.description;
   if (data.status !== undefined) task.status = data.status as any;
   if (data.priority !== undefined) task.priority = data.priority as any;
-  if (data.dueDate !== undefined) task.dueDate = data.dueDate;
+  if (data.dueDate !== undefined) task.dueDate = data.dueDate ?? undefined;
   if (data.attachment !== undefined) task.attachment = data.attachment;
 
   return task.save();

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Layout } from 'antd';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
@@ -29,12 +29,16 @@ const App: React.FC = () => (
   >
     <BrowserRouter>
       <AuthProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-          <Route path="/" element={<ProtectedRoute><BoardView /></ProtectedRoute>} />
-        </Routes>
+        <Layout style={{ minHeight: '100vh', overflowX: 'hidden' }}>
+          <Navbar />
+          <Layout.Content>
+            <Routes>
+              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+              <Route path="/" element={<ProtectedRoute><BoardView /></ProtectedRoute>} />
+            </Routes>
+          </Layout.Content>
+        </Layout>
       </AuthProvider>
     </BrowserRouter>
   </ConfigProvider>
