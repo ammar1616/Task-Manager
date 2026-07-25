@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import { AuthRequest } from '../middleware/auth';
 import * as authService from '../services/authService';
 
 export const register = async (req: Request, res: Response) => {
@@ -33,5 +34,14 @@ export const login = async (req: Request, res: Response) => {
   } catch (error: any) {
     const status = error.message === 'Invalid credentials' ? 401 : 500;
     res.status(status).json({ message: error.message });
+  }
+};
+
+export const getMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await authService.getCurrentUser(req.user!._id);
+    res.json(user);
+  } catch {
+    res.status(404).json({ message: 'User not found' });
   }
 };

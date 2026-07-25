@@ -8,17 +8,26 @@ export const registerUser = async (name: string, email: string, password: string
     throw new Error('Email already in use');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
   const user = await User.create({ name, email, password: hashedPassword });
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
-    expiresIn: '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 
   return {
     token,
     user: { _id: user._id, name: user.name, email: user.email },
   };
+};
+
+export const getCurrentUser = async (userId: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return { _id: user._id, name: user.name, email: user.email };
 };
 
 export const loginUser = async (email: string, password: string) => {
@@ -33,7 +42,7 @@ export const loginUser = async (email: string, password: string) => {
   }
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
-    expiresIn: '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 
   return {
