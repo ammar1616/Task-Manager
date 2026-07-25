@@ -2,6 +2,9 @@ import request from 'supertest';
 import express from 'express';
 import authRoutes from '../routes/auth';
 
+process.env.JWT_SECRET = 'test-jwt-secret';
+process.env.JWT_EXPIRES_IN = '1h';
+
 jest.mock('../models/User');
 
 const app = express();

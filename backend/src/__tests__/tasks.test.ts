@@ -1,13 +1,21 @@
 import request from 'supertest';
 import express from 'express';
 import taskRoutes from '../routes/tasks';
-import { mockAuth, mockUserId, createMockTask } from './helpers';
+import { mockUserId, createMockTask } from './helpers';
+
+jest.mock('../middleware/auth', () => ({
+  __esModule: true,
+  default: (req: any, _res: any, next: any) => {
+    req.user = { _id: 'mock-user-id', name: 'Test User', email: 'test@example.com' };
+    next();
+  },
+}));
 
 jest.mock('../models/Task');
 
 const app = express();
 app.use(express.json());
-app.use('/api/tasks', mockAuth, taskRoutes);
+app.use('/api/tasks', taskRoutes);
 
 describe('Task Routes', () => {
   beforeEach(() => {
