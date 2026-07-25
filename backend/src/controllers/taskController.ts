@@ -5,8 +5,24 @@ import * as taskService from '../services/taskService';
 
 export const getTasks = async (req: AuthRequest, res: Response) => {
   try {
-    const tasks = await taskService.getTasks(req.user!._id);
-    res.json(tasks);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const result = await taskService.getTasks({
+      userId: req.user!._id,
+      search: req.query.search as string,
+      status: req.query.status as string,
+      priority: req.query.priority as string,
+      sortBy: req.query.sortBy as string,
+      order: req.query.order as string,
+      page: req.query.page ? Number(req.query.page) : 1,
+      limit: req.query.limit ? Number(req.query.limit) : 10,
+    });
+
+    res.json(result);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -30,12 +46,15 @@ export const createTask = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    const attachment = req.file ? `/uploads/${req.file.filename}` : undefined;
+
     const task = await taskService.createTask({
       title: req.body.title,
       description: req.body.description,
       status: req.body.status,
       priority: req.body.priority,
       dueDate: req.body.dueDate,
+      attachment,
       userId: req.user!._id,
     });
 
@@ -53,12 +72,15 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    const attachment = req.file ? `/uploads/${req.file.filename}` : undefined;
+
     const task = await taskService.updateTask(req.params.id, req.user!._id, {
       title: req.body.title,
       description: req.body.description,
       status: req.body.status,
       priority: req.body.priority,
       dueDate: req.body.dueDate,
+      attachment,
     });
 
     res.json(task);

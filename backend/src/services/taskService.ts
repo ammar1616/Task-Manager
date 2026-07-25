@@ -1,7 +1,41 @@
 import Task from '../models/Task';
 
-export const getTasks = async (userId: string) => {
-  return Task.find({ user: userId }).sort({ createdAt: -1 });
+interface GetTasksParams {
+  userId: string;
+  search?: string;
+  status?: string;
+  priority?: string;
+  sortBy?: string;
+  order?: string;
+  page?: number;
+  limit?: number;
+}
+
+export const getTasks = async (params: GetTasksParams) => {
+  const { userId, search, status, priority, sortBy, order, page = 1, limit = 10 } = params;
+
+  const filter: any = { user: userId };
+
+  if (search) {
+    filter.title = { $regex: search, $options: 'i' };
+  }
+  if (status) {
+    filter.status = status;
+  }
+  if (priority) {
+    filter.priority = priority;
+  }
+
+  const sortField = sortBy || 'createdAt';
+  const sortOrder = order === 'asc' ? 1 : -1;
+
+  const skip = (page - 1) * limit;
+  const [tasks, total] = await Promise.all([
+    Task.find(filter).sort({ [sortField]: sortOrder }).skip(skip).limit(limit),
+    Task.countDocuments(filter),
+  ]);
+
+  return { tasks, total, page, totalPages: Math.ceil(total / limit) };
 };
 
 export const getTaskById = async (taskId: string, userId: string) => {
@@ -18,6 +52,7 @@ export const createTask = async (data: {
   status?: string;
   priority?: string;
   dueDate?: Date;
+  attachment?: string;
   userId: string;
 }) => {
   return Task.create({
@@ -26,6 +61,7 @@ export const createTask = async (data: {
     status: data.status || 'todo',
     priority: data.priority || 'medium',
     dueDate: data.dueDate,
+    attachment: data.attachment,
     user: data.userId,
   });
 };
@@ -39,6 +75,7 @@ export const updateTask = async (
     status: string;
     priority: string;
     dueDate: Date | null;
+    attachment: string;
   }>
 ) => {
   const task = await Task.findOne({ _id: taskId, user: userId });
@@ -51,6 +88,7 @@ export const updateTask = async (
   if (data.status !== undefined) task.status = data.status as any;
   if (data.priority !== undefined) task.priority = data.priority as any;
   if (data.dueDate !== undefined) task.dueDate = data.dueDate;
+  if (data.attachment !== undefined) task.attachment = data.attachment;
 
   return task.save();
 };
