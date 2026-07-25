@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
+import BoardView from './components/BoardView';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, loading } = useAuth();
@@ -17,12 +18,6 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   if (loading) return null;
   return token ? <Navigate to="/" /> : <>{children}</>;
 };
-
-const Home = () => (
-  <div style={{ padding: 24, textAlign: 'center', marginTop: 80, fontSize: 18, color: '#999' }}>
-    Board view coming next
-  </div>
-);
 
 const App: React.FC = () => (
   <ConfigProvider
@@ -38,7 +33,7 @@ const App: React.FC = () => (
         <Routes>
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><BoardView /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
