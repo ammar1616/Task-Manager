@@ -4,14 +4,15 @@ Full-stack task management application built with the MERN stack (MongoDB, Expre
 
 ## Features
 
-- User registration & login with JWT authentication
+- User registration & login with JWT authentication (bcrypt password hashing)
 - Board view with drag-and-drop task management
 - Task CRUD with title, description, status, priority, due date
-- Instant search by title
-- Filter by priority
+- Instant search by title (case-insensitive)
+- Filter by status and priority
 - File attachments on tasks
-- Pagination (10 tasks per page)
+- Pagination (10 tasks per page, sortable)
 - Responsive design
+- Loading, error, empty-state, and validation feedback
 
 ## Tech Stack
 
@@ -76,6 +77,7 @@ Full-stack task management application built with the MERN stack (MongoDB, Expre
 | Param | Type | Description |
 |-------|------|-------------|
 | search | string | Search by title (case-insensitive) |
+| status | string | Filter: todo, in_progress, done |
 | priority | string | Filter: low, medium, high |
 | sortBy | string | Sort field: createdAt, dueDate, title, priority |
 | order | string | asc or desc |
@@ -88,6 +90,7 @@ Full-stack task management application built with the MERN stack (MongoDB, Expre
 
 - Node.js 18+
 - MongoDB Atlas account (or local MongoDB)
+
 ### Backend
 
 ```bash
@@ -99,7 +102,7 @@ npm run seed   # Populate database with sample data
 npm run dev    # Start dev server on port 5000
 ```
 
-#### Frontend
+### Frontend
 
 ```bash
 cd frontend
@@ -120,7 +123,7 @@ npm start      # Start dev server on port 3000
 
 ## Testing
 
-### Backend (27 tests)
+### Backend (28 tests)
 
 ```bash
 cd backend

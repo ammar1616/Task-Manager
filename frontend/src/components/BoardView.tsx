@@ -20,6 +20,7 @@ const BoardView: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [priorityFilter, setPriorityFilter] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -36,6 +37,7 @@ const BoardView: React.FC = () => {
     try {
       const params: Record<string, unknown> = { page, limit: 10 };
       if (search) params.search = search;
+      if (statusFilter) params.status = statusFilter;
       if (priorityFilter) params.priority = priorityFilter;
 
       const res = await api.get('/tasks', { params, signal: controller.signal });
@@ -48,11 +50,11 @@ const BoardView: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, search, priorityFilter]);
+  }, [page, search, statusFilter, priorityFilter]);
 
   useEffect(() => {
     fetchTasks();
-  }, [fetchTasks]);
+  }, [fetchTasks, statusFilter]);
 
   const getColumnTasks = (status: string) =>
     tasks.filter((t) => t.status === status);
@@ -98,7 +100,20 @@ const BoardView: React.FC = () => {
                   style={{ width: '100%' }}
                 />
               </Col>
-              <Col xs={12} md={6}>
+              <Col xs={12} md={4}>
+                <Select
+                  placeholder="Status"
+                  value={statusFilter}
+                  onChange={(v) => { setStatusFilter(v); setPage(1); }}
+                  allowClear
+                  style={{ width: '100%' }}
+                >
+                  <Select.Option value="todo">To Do</Select.Option>
+                  <Select.Option value="in_progress">In Progress</Select.Option>
+                  <Select.Option value="done">Done</Select.Option>
+                </Select>
+              </Col>
+              <Col xs={12} md={4}>
                 <Select
                   placeholder="Priority"
                   value={priorityFilter}
@@ -111,7 +126,7 @@ const BoardView: React.FC = () => {
                   <Select.Option value="high">High</Select.Option>
                 </Select>
               </Col>
-              <Col xs={12} md={6}>
+              <Col xs={12} md={4}>
                 <Select
                   placeholder="Add Task"
                   style={{ width: '100%' }}

@@ -81,6 +81,24 @@ describe('Task Routes', () => {
         expect.objectContaining({ priority: 'high' })
       );
     });
+
+    it('should filter by status', async () => {
+      const Task = require('../models/Task').default;
+
+      Task.find.mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue([]),
+      });
+      Task.countDocuments.mockResolvedValue(0);
+
+      const res = await request(app).get('/api/tasks?status=in_progress');
+
+      expect(res.status).toBe(200);
+      expect(Task.find).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'in_progress' })
+      );
+    });
   });
 
   describe('POST /api/tasks', () => {
