@@ -149,6 +149,18 @@ All users share the password `password123`.
 
 Run `npm run seed` to populate the database.
 
+## Live Demo
+
+The application is deployed at: [https://task-manager-eight-lac-99.vercel.app/](https://task-manager-eight-lac-99.vercel.app/)
+
+## Known Issues
+
+None.
+
+## AI Tools Disclosure
+
+AI tools were used to assist with refactoring code, writing tests, and documentation. All generated code was reviewed and understood by the developer.
+
 ## Postman Collection
 
 Import `Task-Manager.postman_collection.json` into Postman. Variables (`baseUrl`, `token`) are auto-chained for easy testing.
